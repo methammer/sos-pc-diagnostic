@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"
 $Host.UI.RawUI.WindowTitle = "SOS-PC - Diagnostic en cours..."
 Write-Host ""; Write-Host "  +-----------------------------------------+" -ForegroundColor Cyan; Write-Host "  |        SOS-PC - Diagnostic PC           |" -ForegroundColor Cyan; Write-Host "  +-----------------------------------------+" -ForegroundColor Cyan; Write-Host ""; Write-Host "  Collecte des informations systeme..." -ForegroundColor White; Write-Host ""
 Write-Host "  [1/7] Systeme d exploitation..." -ForegroundColor Gray
