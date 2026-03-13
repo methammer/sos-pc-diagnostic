@@ -26,7 +26,7 @@ Write-Host ""; Write-Host "  Envoi des donnees vers SOS-PC..." -ForegroundColor 
 $sessionId = if ($s) { $s } else { "nosession" }
 try {
   $body = [System.Text.Encoding]::UTF8.GetBytes((@{session=$sessionId;data=$payload}|ConvertTo-Json -Depth 5 -Compress))
-  Invoke-RestMethod -Uri "https://sos-pc.click/api/collect" -Method POST -ContentType "application/json; charset=utf-8" -Body $body | Out-Null
+  Invoke-RestMethod -Uri "https://sos-pc-diagnostic.netlify.app/api/collect" -Method POST -ContentType "application/json; charset=utf-8" -Body $body | Out-Null
   Write-Host "  Donnees envoyees ! Retournez sur sos-pc.click" -ForegroundColor Green
 } catch {
   Write-Host "  Erreur d envoi : $_" -ForegroundColor Red
