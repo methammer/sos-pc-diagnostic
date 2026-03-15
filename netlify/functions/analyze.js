@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  SOS-PC - Netlify Function : analyze.js
 //  POST /api/analyze
 // ============================================================
@@ -18,7 +18,7 @@ export default async (req, context) => {
 
   const origin = req.headers.get("origin") || "";
   const headers = {
-    "Access-Control-Allow-Origin": getAllowedOrigin(origin),
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
@@ -29,74 +29,74 @@ export default async (req, context) => {
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers });
+    return new Response(JSON.stringify({ error: "MÃ©thode non autorisÃ©e" }), { status: 405, headers });
   }
 
   const apiKey = Netlify.env.get("ANTHROPIC_API_KEY");
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Clé API manquante" }), { status: 500, headers });
+    return new Response(JSON.stringify({ error: "ClÃ© API manquante" }), { status: 500, headers });
   }
 
   let body;
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Corps de requête invalide" }), { status: 400, headers });
+    return new Response(JSON.stringify({ error: "Corps de requÃªte invalide" }), { status: 400, headers });
   }
 
   const { data, problem } = body;
   if (!data) {
-    return new Response(JSON.stringify({ error: "Données système manquantes" }), { status: 400, headers });
+    return new Response(JSON.stringify({ error: "DonnÃ©es systÃ¨me manquantes" }), { status: 400, headers });
   }
 
-  const systemPrompt = `Tu es un expert en dépannage PC Windows travaillant pour SOS-PC, 
-un service de réparation informatique professionnel basé en France.
+  const systemPrompt = `Tu es un expert en dÃ©pannage PC Windows travaillant pour SOS-PC, 
+un service de rÃ©paration informatique professionnel basÃ© en France.
 
-Ton rôle : analyser les données techniques d'un PC et fournir un diagnostic clair, 
-structuré et compréhensible pour un utilisateur non-technique.
+Ton rÃ´le : analyser les donnÃ©es techniques d'un PC et fournir un diagnostic clair, 
+structurÃ© et comprÃ©hensible pour un utilisateur non-technique.
 
-Réponds TOUJOURS en JSON valide avec cette structure exacte :
+RÃ©ponds TOUJOURS en JSON valide avec cette structure exacte :
 {
-  "summary": "Résumé en 1-2 phrases du diagnostic général",
+  "summary": "RÃ©sumÃ© en 1-2 phrases du diagnostic gÃ©nÃ©ral",
   "score": 85,
   "issues": [
     {
       "level": "critical|warning|ok",
-      "category": "RAM|CPU|Stockage|Température|Démarrage|Système|Sécurité",
-      "title": "Titre court du problème",
+      "category": "RAM|CPU|Stockage|TempÃ©rature|DÃ©marrage|SystÃ¨me|SÃ©curitÃ©",
+      "title": "Titre court du problÃ¨me",
       "description": "Explication claire pour un non-technicien",
-      "action": "Ce que SOS-PC peut faire pour résoudre ça"
+      "action": "Ce que SOS-PC peut faire pour rÃ©soudre Ã§a"
     }
   ],
   "quick_wins": ["Conseil rapide 1", "Conseil rapide 2"],
   "needs_professional": true,
-  "professional_reason": "Pourquoi faire appel à SOS-PC si needs_professional=true"
+  "professional_reason": "Pourquoi faire appel Ã  SOS-PC si needs_professional=true"
 }
 
-score = note globale de santé du PC de 0 à 100.
-Sois honnête mais rassurant. Propose toujours une solution concrète.`;
+score = note globale de santÃ© du PC de 0 Ã  100.
+Sois honnÃªte mais rassurant. Propose toujours une solution concrÃ¨te.`;
 
   const d = data;
   const userMessage = `
-Problème décrit par l'utilisateur : "${problem || "Non précisé"}"
+ProblÃ¨me dÃ©crit par l'utilisateur : "${problem || "Non prÃ©cisÃ©"}"
 
-=== DONNÉES SYSTÈME COLLECTÉES ===
+=== DONNÃ‰ES SYSTÃˆME COLLECTÃ‰ES ===
 
-SYSTÈME D'EXPLOITATION
+SYSTÃˆME D'EXPLOITATION
 - ${d.os?.name} (Build ${d.os?.build})
 - Architecture : ${d.os?.arch}
-- Uptime depuis dernier redémarrage : ${d.os?.uptime}h
+- Uptime depuis dernier redÃ©marrage : ${d.os?.uptime}h
 
-MÉMOIRE RAM
+MÃ‰MOIRE RAM
 - Total : ${d.os?.ram_total_gb} Go
 - Disponible : ${d.os?.ram_free_gb} Go
-- Utilisée : ${d.os?.ram_total_gb && d.os?.ram_free_gb ? Math.round((1 - d.os.ram_free_gb / d.os.ram_total_gb) * 100) : '?'}%
+- UtilisÃ©e : ${d.os?.ram_total_gb && d.os?.ram_free_gb ? Math.round((1 - d.os.ram_free_gb / d.os.ram_total_gb) * 100) : '?'}%
 
 PROCESSEUR
 - ${d.cpu?.name}
-- ${d.cpu?.cores} cœurs / ${d.cpu?.threads} threads
+- ${d.cpu?.cores} cÅ“urs / ${d.cpu?.threads} threads
 - Charge actuelle : ${d.cpu?.load}%
-- Fréquence max : ${d.cpu?.max_mhz} MHz
+- FrÃ©quence max : ${d.cpu?.max_mhz} MHz
 
 CARTE GRAPHIQUE
 - ${d.gpu?.name}
@@ -104,16 +104,16 @@ CARTE GRAPHIQUE
 - Driver : ${d.gpu?.driver}
 
 STOCKAGE
-${(d.disks || []).map(disk => \`- \${disk.letter} : \${disk.free_gb} Go libres / \${disk.total_gb} Go total (\${disk.pct_used}% utilisé)\`).join('\n')}
+${(d.disks || []).map(disk => \`- \${disk.letter} : \${disk.free_gb} Go libres / \${disk.total_gb} Go total (\${disk.pct_used}% utilisÃ©)\`).join('\n')}
 
 TOP PROCESSUS (RAM)
 ${(d.procs || []).map(p => \`- \${p.name} : \${p.ram_mb} Mo RAM\`).join('\n')}
 
-DÉMARRAGE AUTOMATIQUE
-${(d.startup || []).join(', ') || 'Aucun détecté'}
+DÃ‰MARRAGE AUTOMATIQUE
+${(d.startup || []).join(', ') || 'Aucun dÃ©tectÃ©'}
 
-JOURNAL D'ÉVÉNEMENTS (24 dernières heures)
-- Événements critiques/erreurs : ${d.events?.critical_24h || 0}
+JOURNAL D'Ã‰VÃ‰NEMENTS (24 derniÃ¨res heures)
+- Ã‰vÃ©nements critiques/erreurs : ${d.events?.critical_24h || 0}
 ${(d.events?.samples || []).map(e => \`- [ID \${e.id}] \${e.msg}\`).join('\n')}
 
 Analyse ce PC et fournis un diagnostic JSON complet.`;
@@ -148,14 +148,14 @@ Analyse ce PC et fournis un diagnostic JSON complet.`;
       const cleaned = rawText.replace(/```json|```/g, "").trim();
       report = JSON.parse(cleaned);
     } catch {
-      return new Response(JSON.stringify({ error: "Réponse IA invalide", raw: rawText }), { status: 500, headers });
+      return new Response(JSON.stringify({ error: "RÃ©ponse IA invalide", raw: rawText }), { status: 500, headers });
     }
 
     return new Response(JSON.stringify({ report }), { status: 200, headers });
 
   } catch (err) {
     console.error("Fetch error:", err);
-    return new Response(JSON.stringify({ error: "Erreur réseau" }), { status: 500, headers });
+    return new Response(JSON.stringify({ error: "Erreur rÃ©seau" }), { status: 500, headers });
   }
 };
 

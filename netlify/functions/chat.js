@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  SOS-PC - Netlify Function : chat.js
 //  POST /api/chat
 // ============================================================
@@ -18,17 +18,17 @@ export default async (req) => {
 
   const origin = req.headers.get("origin") || "";
   const headers = {
-    "Access-Control-Allow-Origin": getAllowedOrigin(origin),
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
 
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
-  if (req.method !== "POST") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers });
+  if (req.method !== "POST") return new Response(JSON.stringify({ error: "MÃ©thode non autorisÃ©e" }), { status: 405, headers });
 
   const apiKey = Netlify.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) return new Response(JSON.stringify({ error: "Clé API manquante" }), { status: 500, headers });
+  if (!apiKey) return new Response(JSON.stringify({ error: "ClÃ© API manquante" }), { status: 500, headers });
 
   let body;
   try { body = await req.json(); } catch {
@@ -37,16 +37,16 @@ export default async (req) => {
 
   const { messages, systemData, report } = body;
 
-  const systemPrompt = `Tu es l'assistant de SOS-PC, un service de dépannage informatique professionnel.
-Tu viens de réaliser un diagnostic du PC de l'utilisateur. Voici le rapport :
+  const systemPrompt = `Tu es l'assistant de SOS-PC, un service de dÃ©pannage informatique professionnel.
+Tu viens de rÃ©aliser un diagnostic du PC de l'utilisateur. Voici le rapport :
 ${JSON.stringify(report, null, 2)}
 
-Données techniques du PC :
+DonnÃ©es techniques du PC :
 ${JSON.stringify(systemData, null, 2)}
 
-Réponds aux questions de l'utilisateur de façon claire et simple. 
-Tu peux proposer des solutions à faire soi-même OU recommander de faire appel à SOS-PC si c'est plus adapté.
-Réponds en français, de façon concise et bienveillante.`;
+RÃ©ponds aux questions de l'utilisateur de faÃ§on claire et simple. 
+Tu peux proposer des solutions Ã  faire soi-mÃªme OU recommander de faire appel Ã  SOS-PC si c'est plus adaptÃ©.
+RÃ©ponds en franÃ§ais, de faÃ§on concise et bienveillante.`;
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -72,7 +72,7 @@ Réponds en français, de façon concise et bienveillante.`;
     return new Response(JSON.stringify({ message: text }), { status: 200, headers });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: "Erreur réseau" }), { status: 500, headers });
+    return new Response(JSON.stringify({ error: "Erreur rÃ©seau" }), { status: 500, headers });
   }
 };
 
