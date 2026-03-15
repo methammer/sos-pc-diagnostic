@@ -1,15 +1,24 @@
 // ============================================================
 //  SOS-PC - Netlify Function : analyze.js
 //  POST /api/analyze
-//  Body : { data: { ...systemInfo }, problem: "description" }
-//  Retourne : { report, sessionId }
 // ============================================================
+
+const ALLOWED_ORIGINS = [
+  "https://sos-pc.click",
+  "https://design-alternative--sos-pc-website-test-2.netlify.app",
+  "http://localhost:4321",
+  "http://localhost:3000",
+];
+
+function getAllowedOrigin(origin) {
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+}
 
 export default async (req, context) => {
 
-  // CORS
+  const origin = req.headers.get("origin") || "";
   const headers = {
-    "Access-Control-Allow-Origin": "https://sos-pc.click",
+    "Access-Control-Allow-Origin": getAllowedOrigin(origin),
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
@@ -40,7 +49,6 @@ export default async (req, context) => {
     return new Response(JSON.stringify({ error: "Données système manquantes" }), { status: 400, headers });
   }
 
-  // Construction du prompt système
   const systemPrompt = `Tu es un expert en dépannage PC Windows travaillant pour SOS-PC, 
 un service de réparation informatique professionnel basé en France.
 
@@ -61,14 +69,13 @@ Réponds TOUJOURS en JSON valide avec cette structure exacte :
     }
   ],
   "quick_wins": ["Conseil rapide 1", "Conseil rapide 2"],
-  "needs_professional": true|false,
+  "needs_professional": true,
   "professional_reason": "Pourquoi faire appel à SOS-PC si needs_professional=true"
 }
 
 score = note globale de santé du PC de 0 à 100.
 Sois honnête mais rassurant. Propose toujours une solution concrète.`;
 
-  // Construction du message utilisateur
   const d = data;
   const userMessage = `
 Problème décrit par l'utilisateur : "${problem || "Non précisé"}"
@@ -97,17 +104,17 @@ CARTE GRAPHIQUE
 - Driver : ${d.gpu?.driver}
 
 STOCKAGE
-${(d.disks || []).map(disk => `- ${disk.letter} : ${disk.free_gb} Go libres / ${disk.total_gb} Go total (${disk.pct_used}% utilisé)`).join('\n')}
+${(d.disks || []).map(disk => \`- \${disk.letter} : \${disk.free_gb} Go libres / \${disk.total_gb} Go total (\${disk.pct_used}% utilisé)\`).join('\n')}
 
 TOP PROCESSUS (RAM)
-${(d.procs || []).map(p => `- ${p.name} : ${p.ram_mb} Mo RAM`).join('\n')}
+${(d.procs || []).map(p => \`- \${p.name} : \${p.ram_mb} Mo RAM\`).join('\n')}
 
 DÉMARRAGE AUTOMATIQUE
 ${(d.startup || []).join(', ') || 'Aucun détecté'}
 
 JOURNAL D'ÉVÉNEMENTS (24 dernières heures)
 - Événements critiques/erreurs : ${d.events?.critical_24h || 0}
-${(d.events?.samples || []).map(e => `- [ID ${e.id}] ${e.msg}`).join('\n')}
+${(d.events?.samples || []).map(e => \`- [ID \${e.id}] \${e.msg}\`).join('\n')}
 
 Analyse ce PC et fournis un diagnostic JSON complet.`;
 
@@ -136,7 +143,6 @@ Analyse ce PC et fournis un diagnostic JSON complet.`;
     const result = await response.json();
     const rawText = result.content?.[0]?.text || "";
 
-    // Parse JSON proprement
     let report;
     try {
       const cleaned = rawText.replace(/```json|```/g, "").trim();

@@ -1,13 +1,24 @@
 // ============================================================
 //  SOS-PC - Netlify Function : chat.js
 //  POST /api/chat
-//  Body : { messages: [...], systemData: {...}, report: {...} }
 // ============================================================
+
+const ALLOWED_ORIGINS = [
+  "https://sos-pc.click",
+  "https://design-alternative--sos-pc-website-test-2.netlify.app",
+  "http://localhost:4321",
+  "http://localhost:3000",
+];
+
+function getAllowedOrigin(origin) {
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+}
 
 export default async (req) => {
 
+  const origin = req.headers.get("origin") || "";
   const headers = {
-    "Access-Control-Allow-Origin": "https://sos-pc.click",
+    "Access-Control-Allow-Origin": getAllowedOrigin(origin),
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
