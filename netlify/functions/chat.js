@@ -118,3 +118,4 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
 
 export const config = { path: "/api/chat" };
 
+
