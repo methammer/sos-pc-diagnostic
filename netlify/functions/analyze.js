@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  SOS-PC - Netlify Function : analyze.js
 //  POST /api/analyze
 //  Body : { data: { ...systemInfo }, problem: "description" }
@@ -17,7 +17,10 @@ export default async (req, context) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
   if (req.method !== "POST") return new Response(JSON.stringify({ error: "Methode non autorisee" }), { status: 405, headers });
 
+  // Netlify AI Gateway injecte automatiquement GEMINI_API_KEY et GOOGLE_GEMINI_BASE_URL
+  // Si GEMINI_API_KEY n'est pas defini manuellement, Netlify le fournit via son AI Gateway
   const apiKey = Netlify.env.get("GEMINI_API_KEY");
+  const baseUrl = Netlify.env.get("GOOGLE_GEMINI_BASE_URL") || "https://generativelanguage.googleapis.com";
   if (!apiKey) return new Response(JSON.stringify({ error: "Cle API manquante" }), { status: 500, headers });
 
   let body;
@@ -28,7 +31,7 @@ export default async (req, context) => {
   const { data, problem } = body;
   if (!data) return new Response(JSON.stringify({ error: "Donnees systeme manquantes" }), { status: 400, headers });
 
-  // Construction du rapport texte sans template literals imbriquÃ©s
+  // Construction du rapport texte sans template literals imbriqués
   const d = data;
   const lines = [];
 
@@ -81,11 +84,11 @@ export default async (req, context) => {
   const prompt = lines.join("\n");
 
   try {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" + apiKey;
+    const url = baseUrl + "/v1beta/models/gemini-2.0-flash-lite:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.2, maxOutputTokens: 2000 },
@@ -124,8 +127,3 @@ export default async (req, context) => {
 };
 
 export const config = { path: "/api/analyze" };
-
-
-
-
-

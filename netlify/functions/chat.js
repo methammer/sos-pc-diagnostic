@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  SOS-PC - Netlify Function : chat.js
 //  POST /api/chat
 //  Body : { messages: [...], systemData: {...}, report: {...} }
@@ -17,6 +17,7 @@ export default async (req) => {
   if (req.method !== "POST") return new Response(JSON.stringify({ error: "Methode non autorisee" }), { status: 405, headers });
 
   const apiKey = Netlify.env.get("GEMINI_API_KEY");
+  const baseUrl = Netlify.env.get("GOOGLE_GEMINI_BASE_URL") || "https://generativelanguage.googleapis.com";
   if (!apiKey) return new Response(JSON.stringify({ error: "Cle API manquante" }), { status: 500, headers });
 
   let body;
@@ -29,7 +30,7 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: "Messages manquants" }), { status: 400, headers });
   }
 
-  // Contexte systeme â€” sera prefixe au premier tour utilisateur
+  // Contexte systeme — sera prefixe au premier tour utilisateur
   const systemContext = `Tu es l'assistant de SOS-PC, un service de depannage informatique professionnel base en France.
 Tu viens de realiser un diagnostic du PC de l'utilisateur.
 
@@ -85,11 +86,11 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
   }
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
+    const url = baseUrl + "/v1beta/models/gemini-2.0-flash-lite:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: geminiContents,
         generationConfig: {
@@ -117,8 +118,3 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
 };
 
 export const config = { path: "/api/chat" };
-
-
-
-
-
