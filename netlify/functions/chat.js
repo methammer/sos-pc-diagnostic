@@ -85,7 +85,7 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
   }
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -117,6 +117,7 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
 };
 
 export const config = { path: "/api/chat" };
+
 
 
 
