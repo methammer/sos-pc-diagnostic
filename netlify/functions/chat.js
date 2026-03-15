@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  SOS-PC - Netlify Function : chat.js
 //  POST /api/chat
 //  Body : { messages: [...], systemData: {...}, report: {...} }
@@ -29,7 +29,7 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: "Messages manquants" }), { status: 400, headers });
   }
 
-  // Contexte systeme — sera prefixe au premier tour utilisateur
+  // Contexte systeme â€” sera prefixe au premier tour utilisateur
   const systemContext = `Tu es l'assistant de SOS-PC, un service de depannage informatique professionnel base en France.
 Tu viens de realiser un diagnostic du PC de l'utilisateur.
 
@@ -85,7 +85,7 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
   }
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -117,3 +117,4 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
 };
 
 export const config = { path: "/api/chat" };
+

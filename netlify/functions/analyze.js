@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  SOS-PC - Netlify Function : analyze.js
 //  POST /api/analyze
 //  Body : { data: { ...systemInfo }, problem: "description" }
@@ -28,7 +28,7 @@ export default async (req, context) => {
   const { data, problem } = body;
   if (!data) return new Response(JSON.stringify({ error: "Donnees systeme manquantes" }), { status: 400, headers });
 
-  // Construction du rapport texte sans template literals imbriqués
+  // Construction du rapport texte sans template literals imbriquÃ©s
   const d = data;
   const lines = [];
 
@@ -81,7 +81,7 @@ export default async (req, context) => {
   const prompt = lines.join("\n");
 
   try {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
     const response = await fetch(url, {
       method: "POST",
@@ -124,3 +124,4 @@ export default async (req, context) => {
 };
 
 export const config = { path: "/api/analyze" };
+
