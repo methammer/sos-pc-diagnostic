@@ -29,7 +29,7 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: "Messages manquants" }), { status: 400, headers });
   }
 
-  // Contexte systeme injecte en premier message utilisateur (system prompt via user turn pour Gemini)
+  // Contexte systeme — sera prefixe au premier tour utilisateur
   const systemContext = `Tu es l'assistant de SOS-PC, un service de depannage informatique professionnel base en France.
 Tu viens de realiser un diagnostic du PC de l'utilisateur.
 
@@ -40,35 +40,48 @@ Donnees techniques du PC :
 ${JSON.stringify(systemData, null, 2)}
 
 Reponds aux questions de l'utilisateur de facon claire et simple.
-Tu peux proposer des solutions a faire soi-meme OU recommander de faire appel a SOS-PC si c'est plus adapte.
-Reponds en francais, de facon concise et bienveillante. 2-3 phrases maximum sauf si l'utilisateur demande plus de details.`;
+Tu peux proposer des solutions a faire soi-meme OU recommander SOS-PC si c'est plus adapte.
+Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si l'utilisateur demande plus de details.`;
 
-  // Convertir l'historique au format Gemini
-  // Gemini : role "user" | "model" (pas "assistant")
-  // Premier message = contexte systeme + premier message user
+  // Convertir au format Gemini (role: "user" | "model")
+  // Regles :
+  // - Le premier message DOIT etre "user"
+  // - Pas deux messages consecutifs du meme role
+  // - Les messages "assistant" deviennent "model"
   const geminiContents = [];
+  let systemInjected = false;
 
-  messages.forEach((msg, i) => {
+  for (const msg of messages) {
     const role = msg.role === "user" ? "user" : "model";
     let text = msg.content;
 
-    // Injecter le contexte systeme avant le premier message utilisateur
-    if (i === 0 && msg.role === "user") {
-      text = systemContext + "\n\n---\n\nQuestion de l'utilisateur : " + msg.content;
+    // Injecter le contexte systeme dans le premier message user
+    if (role === "user" && !systemInjected) {
+      text = systemContext + "\n\n---\n\n" + text;
+      systemInjected = true;
     }
 
-    // Gemini n'accepte pas deux messages consecutifs du meme role
-    // Si le dernier message ajouté a le même role, on fusionne
+    // Si le premier message est "model" (assistant), l'encapsuler dans un echange user/model fictif
+    if (!systemInjected && role === "model") {
+      geminiContents.push({
+        role: "user",
+        parts: [{ text: systemContext + "\n\n---\n\nResume le diagnostic effectue." }]
+      });
+      systemInjected = true;
+    }
+
+    // Fusionner si meme role consecutif
     if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
       geminiContents[geminiContents.length - 1].parts[0].text += "\n" + text;
     } else {
       geminiContents.push({ role, parts: [{ text }] });
     }
-  });
+  }
 
-  // Gemini exige que le dernier message soit "user"
+  // Securite : le dernier message doit etre "user"
   if (geminiContents.length === 0 || geminiContents[geminiContents.length - 1].role !== "user") {
-    return new Response(JSON.stringify({ error: "Historique invalide" }), { status: 400, headers });
+    // Ajouter un message user de relance si l'historique se termine par "model"
+    geminiContents.push({ role: "user", parts: [{ text: "Continue." }] });
   }
 
   try {
