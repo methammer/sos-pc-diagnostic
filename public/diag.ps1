@@ -229,7 +229,16 @@ $installedSoftware = Get-ItemProperty $softwarePaths -ErrorAction SilentlyContin
         $_.DisplayName -notmatch "^WinRT" -and
         $_.DisplayName -notmatch "^vs_" -and
         $_.DisplayName -notmatch "^vcpp_" -and
-        $_.DisplayName -notmatch "^KB[0-9]"
+        $_.DisplayName -notmatch "^KB[0-9]" -and
+        $_.DisplayName -notmatch "Add to Path|Core Interpreter|Development Libraries" -and
+        $_.DisplayName -notmatch "pip Bootstrap|Standard Library|Tcl/Tk Support|Test Suite" -and
+        $_.DisplayName -notmatch "Python Launcher|Python [0-9]+\.[0-9]+ (Add|Core|Dev|Doc|Exe|pip|Std|Tcl|Test)" -and
+        $_.DisplayName -notmatch "AppHost Pack|Targeting Pack|Toolset|Templates [0-9]" -and
+        $_.DisplayName -notmatch "Host FX Resolver|Host - [0-9]|Runtime - [0-9]" -and
+        $_.DisplayName -notmatch "Workload\.(Emscripten|Mono|Maui|iOS|tvOS|Android|MacCatalyst|macOS)" -and
+        $_.DisplayName -notmatch "Manifest-[0-9]|SDK\.[A-Z]" -and
+        $_.DisplayName -notmatch "Redistributable.*- [0-9]{2}\.[0-9]" -and
+        $_.DisplayName -notmatch "^Update for " 
     } |
     Sort-Object DisplayName |
     ForEach-Object {
