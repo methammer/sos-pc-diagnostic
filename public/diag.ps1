@@ -96,13 +96,12 @@ $netAdapters = Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | ForEach-Ob
 
 # Test connectivite
 $pingGoogle  = Test-Connection -ComputerName "8.8.8.8"      -Count 1 -Quiet -ErrorAction SilentlyContinue
-$pingGateway = (Test-NetConnection -ComputerName (Get-NetRoute -DestinationPrefix "0.0.0.0/0" | Sort-Object RouteMetric | Select-Object -First 1).NextHop -WarningAction SilentlyContinue).PingSucceeded
+
 $dnsLatency  = Measure-Command { Resolve-DnsName "google.com" -ErrorAction SilentlyContinue } | Select-Object -ExpandProperty TotalMilliseconds
 
 $networkInfo = @{
     adapters        = @($netAdapters)
     internet_ok     = $pingGoogle
-    gateway_ok      = $pingGateway
     dns_latency_ms  = [math]::Round($dnsLatency)
 }
 
