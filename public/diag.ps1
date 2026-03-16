@@ -217,7 +217,20 @@ $softwarePaths = @(
     "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"
 )
 $installedSoftware = Get-ItemProperty $softwarePaths -ErrorAction SilentlyContinue |
-    Where-Object { $_.DisplayName -and $_.DisplayName -ne "" } |
+    Where-Object {
+        $_.DisplayName -and
+        $_.DisplayName -ne "" -and
+        $_.Publisher -notmatch "^Microsoft" -and
+        $_.Publisher -notmatch "^Windows" -and
+        $_.DisplayName -notmatch "^Microsoft" -and
+        $_.DisplayName -notmatch "^Windows SDK" -and
+        $_.DisplayName -notmatch "^Windows Desktop" -and
+        $_.DisplayName -notmatch "^Universal CRT" -and
+        $_.DisplayName -notmatch "^WinRT" -and
+        $_.DisplayName -notmatch "^vs_" -and
+        $_.DisplayName -notmatch "^vcpp_" -and
+        $_.DisplayName -notmatch "^KB[0-9]"
+    } |
     Sort-Object DisplayName |
     ForEach-Object {
         @{
