@@ -161,7 +161,7 @@ export default async (req, context) => {
   const prompt = lines.join("\n");
 
   try {
-    const url = baseUrl + "/v1beta/models/gemini-2.0-flash:generateContent";
+    const url = baseUrl + "/v1beta/models/gemini-1.5-flash:generateContent";
 
     const response = await fetch(url, {
       method: "POST",

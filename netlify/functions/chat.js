@@ -112,7 +112,7 @@ Reponds en francais, de facon concise et bienveillante. 2-3 phrases max sauf si 
   }
 
   try {
-    const url = baseUrl + "/v1beta/models/gemini-2.0-flash:generateContent";
+    const url = baseUrl + "/v1beta/models/gemini-1.5-flash:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
