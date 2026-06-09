@@ -161,14 +161,18 @@ export default async (req, context) => {
   const prompt = lines.join("\n");
 
   try {
-    const url = baseUrl + "/v1beta/models/gemini-2.5-flash:generateContent";
+    const url = baseUrl + "/v1beta/models/gemini-2.0-flash:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 2000 },
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 2000,
+          response_mime_type: "application/json",
+        },
       }),
     });
 
