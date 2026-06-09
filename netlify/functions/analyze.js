@@ -21,8 +21,7 @@ export default async (req, context) => {
       headers,
     });
 
-  // Netlify AI Gateway injecte automatiquement GEMINI_API_KEY et GOOGLE_GEMINI_BASE_URL
-  // Si GEMINI_API_KEY n'est pas defini manuellement, Netlify le fournit via son AI Gateway
+  // Netlify AI Gateway (fournit GEMINI_API_KEY et GOOGLE_GEMINI_BASE_URL automatiquement)
   const apiKey = Netlify.env.get("GEMINI_API_KEY");
   const baseUrl =
     Netlify.env.get("GOOGLE_GEMINI_BASE_URL") ||
@@ -161,7 +160,7 @@ export default async (req, context) => {
   const prompt = lines.join("\n");
 
   try {
-    const url = baseUrl + "/v1beta/models/gemini-1.5-flash:generateContent";
+    const url = baseUrl + "/v1beta/models/gemini-2.0-flash:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
