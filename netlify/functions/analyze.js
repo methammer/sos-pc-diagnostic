@@ -194,17 +194,23 @@ export default async (req, context) => {
 
     let report;
     try {
-      const cleaned = rawText
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
+      let cleaned = rawText
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
         .trim();
       report = JSON.parse(cleaned);
-    } catch (parseErr) {
-      console.error("JSON parse error:", parseErr, "raw:", rawText);
-      return new Response(
-        JSON.stringify({ error: "Reponse IA invalide", raw: rawText }),
-        { status: 500, headers },
-      );
+    } catch {
+      try {
+        const m = rawText.match(/\{[\s\S]*\}/);
+        if (!m) throw new Error("Pas de JSON");
+        report = JSON.parse(m[0]);
+      } catch (parseErr2) {
+        console.error("JSON parse error:", parseErr2, "raw:", rawText);
+        return new Response(
+          JSON.stringify({ error: "Reponse IA invalide", raw: rawText }),
+          { status: 500, headers },
+        );
+      }
     }
 
     return new Response(JSON.stringify({ report }), { status: 200, headers });
